@@ -76,7 +76,7 @@
 	Draggable.prototype._bindEvent = function( ptr, eventType, handler ){
 	  var self = this;
 
-	  if( this.supportTouches_ )
+	  if( this.supportTouches_ || this.supportMSPointers )
       ptr.get(0).addEventListener( this.events_[ eventType ], handler, false );
 	  
 	  else
@@ -86,12 +86,13 @@
 	Draggable.prototype._events = function(){
 		var self = this;
 
+    this.supportMSPointers = window.navigator && window.navigator.msPointerEnabled;
     this.supportTouches_ = 'ontouchend' in document;
     this.events_ = {
       "click": this.supportTouches_ ? "touchstart" : "click",
-      "down": this.supportTouches_ ? "touchstart" : "mousedown",
-      "move": this.supportTouches_ ? "touchmove" : "mousemove",
-      "up"  : this.supportTouches_ ? "touchend" : "mouseup"
+      "down": this.supportMSPointers ? "MSPointerDown" :  (this.supportTouches_ ? "touchstart" : "mousedown"),
+      "move": this.supportMSPointers ? "MSPointerMove" : (this.supportTouches_ ? "touchmove" : "mousemove"),
+      "up"  : this.supportMSPointers ? "MSPointerUp" : (this.supportTouches_ ? "touchend" : "mouseup")
     };
 
     this._bindEvent( $( document ), "move", function( event ){
